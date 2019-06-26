@@ -33,7 +33,7 @@ done < <(env | sort)
 workdir="${BUILDKITE_PLUGIN_ARTIFACTS_WORKDIR:-.}"
 
 if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD} ]] || ([[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]); then
-  if ! [[ -z ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && ! [[ -z ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]; then
+  if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]; then
     source="${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM}"
   else
     source="${paths[*]}"
@@ -62,7 +62,7 @@ elif [[ "${#paths[@]}" -ge 1 ]]; then
       do
         source_env_var="BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_${index}_FROM"
         dest_env_var="BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_${index}_TO"
-        if ! [[ -z ${!source_env_var} ]] && ! [[ -z ${!dest_env_var} ]]; then
+        if [[ -n ${!source_env_var} ]] && [[ -n ${!dest_env_var} ]]; then
           source="${!source_env_var}"
         else
           source="${path}"
@@ -84,7 +84,7 @@ elif [[ "${#paths[@]}" -ge 1 ]]; then
       do
         source_env_var="BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_${index}_FROM"
         dest_env_var="BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_${index}_TO"
-        if ! [[ -z ${!source_env_var} ]] && ! [[ -z ${!dest_env_var} ]]; then
+        if [[ -n ${!source_env_var} ]] && [[ -n ${!dest_env_var} ]]; then
           source="${!source_env_var}"
         else
           source="${path}"

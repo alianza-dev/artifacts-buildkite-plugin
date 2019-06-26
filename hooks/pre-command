@@ -18,22 +18,28 @@ fi
 
 paths=()
 
-if [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD:-}" ]] ; then
-  paths+=("$BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD")
-elif [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM:-}" ]] && [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO:-}" ]] ; then
-  paths+=("$BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM")
+
+if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD} ]] || ([[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]); then
+    SINGULAR_DOWNLOAD_OBJECT="true"
+    if [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD:-}" ]] ; then
+      paths+=("$BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD")
+    elif [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM:-}" ]] && [[ -n "${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO:-}" ]] ; then
+      RELOCATION="true"
+      paths+=("$BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM")
+    fi
 fi
 
 while IFS='=' read -r path _ ; do
   if [[ $path =~ ^(BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_[0-9]+) ]] && ! [[ $path =~ ^(BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_[0-9]_TO+) ]]; then
+    MULTIPLE_DOWNLOADS="true"
     paths+=("${!path}")
   fi
 done < <(env | sort)
 
 workdir="${BUILDKITE_PLUGIN_ARTIFACTS_WORKDIR:-.}"
 
-if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD} ]] || ([[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]); then
-  if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ]] && [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO} ]]; then
+if [[ "${SINGULAR_DOWNLOAD_OBJECT}" == "true" ]]; then
+  if [[ "${RELOCATION}" == "true" ]]; then
     source="${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM}"
   else
     source="${paths[*]}"
@@ -53,8 +59,7 @@ if [[ -n ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD} ]] || ([[ -n ${BUILDKITE_PLUGIN_
     echo "~~~ Moving [${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM}] to [${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO}]..."
     mv ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_FROM} ${BUILDKITE_PLUGIN_ARTIFACTS_DOWNLOAD_TO}
   fi
-
-elif [[ "${#paths[@]}" -ge 1 ]]; then
+elif [[ "${MULTIPLE_DOWNLOADS}" == "true" ]]; then
   index=0
   if [[ "${#args[@]}" -gt 0 ]]; then
     echo "~~~ Downloading artifacts with args: ${args[*]}"

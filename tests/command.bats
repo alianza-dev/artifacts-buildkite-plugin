@@ -114,7 +114,7 @@ load '/usr/local/lib/bats/load.bash'
 @test "Pre-command downloads multiple artifacts with some relocation" {
   touch /tmp/foo.log
   stub buildkite-agent \
-    "artifact download /tmp/foo.log : echo Downloading artifacts" \
+    "artifact download /tmp/foo.log . : echo Downloading artifacts" \
     "artifact download bar.log . : echo Downloading artifacts" \
     "artifact download baz.log . : echo Downloading artifacts"
 

@@ -2,7 +2,6 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: artifacts-buildkite-plugin
-  namespace: engex
   title: Artifacts Buildkite Plugin
   description: Buildkite plugin for uploading and downloading build artifacts within CI pipelines.
   annotations:
@@ -11,17 +10,11 @@ metadata:
     alianza.com/audience: internal-engineering
     alianza.com/data-classification: internal
     alianza.com/runtime: shell
-    alianza.com/framework: none
-    alianza.com/packaging: none
-    alianza.com/build-tool: other
-    alianza.com/test-framework: none
     alianza.com/architecture: x86-64
     alianza.com/compute-model: bare-metal
-    alianza.com/compute-platform: none
     alianza.com/cloud-provider: aws
-    alianza.com/deployment-method: none
 spec:
   type: tool
   lifecycle: production
   owner: group:engex
-  system: system:engex/ci-cd
+  system: system:ci-cd
